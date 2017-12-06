@@ -42,6 +42,7 @@ class WAV_HEADER
 int getFileSize(FILE *inFile); 
 void PrintWaveHeader(WAV_HEADER wav_hdr);
 
+
 int resultLength;
 
 
@@ -58,7 +59,8 @@ int getFileSize(FILE* inFile)
 }
 
 void PrintWaveHeader(WAV_HEADER wav_hdr){
-            
+    
+        
     cout << "--- RIFF Chunk Descriptor ---" << endl;
     cout << "RIFF header                :" << wav_hdr.RIFF[0] << wav_hdr.RIFF[1] << wav_hdr.RIFF[2] << wav_hdr.RIFF[3] << endl;
     cout << "Chunk size                 :" << wav_hdr.ChunkSize << endl;
@@ -77,7 +79,7 @@ void PrintWaveHeader(WAV_HEADER wav_hdr){
     cout << "-- data sub-chunk -----------" << endl;
     cout << "Subchunk2ID                :" << wav_hdr.Subchunk2ID[0] << wav_hdr.Subchunk2ID[1] << wav_hdr.Subchunk2ID[2] << wav_hdr.Subchunk2ID[3] << endl;
     cout << "Subchunk2Size (bytes)      :" << wav_hdr.Subchunk2Size << endl;
-
+    
 }
 
 
@@ -106,8 +108,7 @@ void convolve(double x[], int N, double h[], int M, double y[], int P){
             
             if((abs(y[n + m])) > max)
                 max = abs(y[n+m]);
-          
-            
+                  
         }
     }
     
@@ -115,8 +116,7 @@ void convolve(double x[], int N, double h[], int M, double y[], int P){
     for(int i = 0; i < resultLength; i++){
         y[i] = y[i] / max;
     }
-    
-        
+            
 }
 
 
@@ -234,9 +234,7 @@ void writeWAVFile(string outputFile, double outputData[], int outputLength, int 
     for(int i = 0; i < outputLength; i++){
         
         outData = (int16_t) (outputData[i] * INT16_MAX);
-        
-      // cout << outData << endl;
-        
+
         outputStream.write((char*)&outData, 2);
         
     }
@@ -292,6 +290,11 @@ int main(int argc, char** argv)
     cout << "writing wav file" << endl;
     writeWAVFile(argv[3], result, resultLength, inputAudio.SamplesPerSec);
     cout << "finished writing wav" << endl;
+    
+    
+   // WAV_HEADER outputAudio;
+    //double* outputDataArray;
+    //int outputArrayLength = GetWaveData(argv[3], outputAudio, outputDataArray);
     
     cout << "Finished everything" << endl;
     

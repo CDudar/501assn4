@@ -6,13 +6,10 @@
 #include <stdint.h>
 #include <math.h>
 
+
+#define SWAP(a,b)  tempr=(a);(a)=(b);(b)=tempr
+
 using namespace std;
-
-
-//double* result;
-void four1(double*, int, int);
-void convolve(double*, int, double*, int, double*, int);
-void writeWAVFile(string, double*, int, int);
 
 
 class WAV_HEADER
@@ -43,6 +40,15 @@ class WAV_HEADER
         WAV_HEADER(string);
     
 };
+
+
+int resultLength;
+
+//double* result;
+void four1(double*, int, int);
+void convolve(double*, int, double*, int, double*, int);
+void writeWAVFile(string, double*, int, int);
+void PrintWaveHeader(WAV_HEADER);
 
 
 WAV_HEADER::WAV_HEADER(string fileName){
@@ -99,6 +105,7 @@ WAV_HEADER::WAV_HEADER(string fileName){
     
     input.close();
 }
+
 
 
 /*Following algorithm taken from class handout */
@@ -165,39 +172,89 @@ void four1(double data[], int nn, int isign)
 
 void convolve(double x[], int N, double h[], int M, double y[], int P){
     
+
+    
     cout << "entering convolve function" << endl;
+
+    cout << "N: " << N << endl;
+    cout << "M: " << M << endl;
+
+    int longestInput = max(N, M);
     
-    int n, m;
+    cout << "longest input: " << longestInput << endl;
     
-    /*Clear output buffer y[]*/
-    for(n = 0; n < P; n++){
-        y[n] = 0.0;
+    
+    //powerOf2 AKA nn
+    int powerOf2 = 1;
+    while(longestInput > powerOf2){
+        powerOf2 *= 2;
     }
     
-    /*Outer loop, process each input value x[n] in turn */
+    int actualSize = powerOf2 * 2;
     
-    cout << "about to hit loop" << endl;
+    cout << "power of 2: " << powerOf2 << endl;
     
-    double max = 0;
+    cout << "actual size: " << actualSize << endl;
     
-    for(n = 0; n < N; n++){
-        
-        /*Inner loop process x[n] with each sample of h[n]*/
-        for(m = 0; m < M; m++){
-            y[n + m] += x[n] * h[m];
-            
-            if((abs(y[n + m])) > max)
-                max = abs(y[n+m]);
-          
-            
-        }
+    double* inputDataPadded = new double[actualSize];
+    
+    double* impulseDataPadded = new double[actualSize];
+    
+    
+    //Zero-padding audio and impulse files
+    
+    for (int i = 0; i < actualSize; i++){
+        inputDataPadded[i] = 0;
+    }
+    cout << "zeroed input data" << endl;
+    
+    for(int i = 0; i < N; i++){
+        inputDataPadded[i * 2] = x[i];
+    }
+
+    cout << "put input audio data into padded array" << endl;
+
+    for(int i = M; i < actualSize; i++){
+        impulseDataPadded[i] = 0;
     }
     
+    for(int i = 0; i < M; i++){
+        impulseDataPadded[i * 2] = h[i];
+    }
+    
+
+    
+    cout << "entering fft algo" << endl;
+    //running through fft
+    four1(inputDataPadded - 1, powerOf2, 1);
+    four1(impulseDataPadded - 1, powerOf2, 1);
+    
+    cout << "exiting fft algo" << endl;
+    
+    double* outputData = new double[actualSize];
+    
+    for(int i = 0; i < actualSize; i = i + 2){
+        outputData[i] = (inputDataPadded[i] * impulseDataPadded[i]) - (inputDataPadded[i + 1] * impulseDataPadded[i + 1]);
+        outputData[i + 1] = (inputDataPadded[i + 1] * impulseDataPadded[i]) + (inputDataPadded[i] * impulseDataPadded[i + 1]);
+    }
+    
+    cout << "inversing fft" << endl;
+    four1(outputData-1, powerOf2, -1);
+    
+    cout << "done inversing fft" << endl;
+
+
+    double max = 0.0;
+    for(int i = 0 ; i < resultLength; i++){
+        y[i] = outputData[i * 2];
+    
+        if((abs(outputData[i * 2])) >  max)
+            max = abs(outputData[i * 2]);
+    }
     
     for(int i = 0; i < resultLength; i++){
         y[i] = y[i] / max;
     }
-    
         
 }
 
@@ -257,9 +314,7 @@ void writeWAVFile(string outputFile, double outputData[], int outputLength, int 
     for(int i = 0; i < outputLength; i++){
         
         outData = (int16_t) (outputData[i] * INT16_MAX);
-        
-      // cout << outData << endl;
-        
+                
         outputStream.write((char*)&outData, 2);
         
     }
@@ -269,6 +324,31 @@ void writeWAVFile(string outputFile, double outputData[], int outputLength, int 
 }
 
 
+void PrintWaveHeader(WAV_HEADER wav_hdr){
+    
+        
+    cout << "--- RIFF Chunk Descriptor ---" << endl;
+    cout << "RIFF header                :" << wav_hdr.RIFF[0] << wav_hdr.RIFF[1] << wav_hdr.RIFF[2] << wav_hdr.RIFF[3] << endl;
+    cout << "Chunk size                 :" << wav_hdr.ChunkSize << endl;
+    cout << "Format                     :" << wav_hdr.WAVE[0] << wav_hdr.WAVE[1] << wav_hdr.WAVE[2] << wav_hdr.WAVE[3] << endl;
+        
+    cout << "--- fmt sub-chunk -----------" << endl;
+    cout << "Subchunk1ID                :" << "'" << wav_hdr.fmt[0] << wav_hdr.fmt[1] << wav_hdr.fmt[2] << wav_hdr.fmt[3] << "'" << endl;
+    cout << "Subchunk1-Size             :" << wav_hdr.Subchunk1Size << endl;
+    cout << "Audio Format               :" << wav_hdr.AudioFormat << endl;
+    cout << "Number of channels         :" << wav_hdr.NumOfChan << endl;
+    cout << "Sampling Rate              :" << wav_hdr.SamplesPerSec << endl;    
+    cout << "Byte Rate                  :" << wav_hdr.bytesPerSec << endl;
+    cout << "Block Align                :" << wav_hdr.blockAlign << endl;
+    cout << "Bits per sample            :" << wav_hdr.bitsPerSample << endl;
+    
+    cout << "-- data sub-chunk -----------" << endl;
+    cout << "Subchunk2ID                :" << wav_hdr.Subchunk2ID[0] << wav_hdr.Subchunk2ID[1] << wav_hdr.Subchunk2ID[2] << wav_hdr.Subchunk2ID[3] << endl;
+    cout << "Subchunk2Size (bytes)      :" << wav_hdr.Subchunk2Size << endl;
+    
+    
+    
+}
 
 int main(int argc, char** argv) 
 {
