@@ -214,7 +214,7 @@ void convolve(double x[], int N, double h[], int M, double y[], int P){
 
     cout << "put input audio data into padded array" << endl;
 
-    for(int i = M; i < actualSize; i++){
+    for(int i = 0; i < actualSize; i++){
         impulseDataPadded[i] = 0;
     }
     
