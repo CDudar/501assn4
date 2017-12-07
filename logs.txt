@@ -1,0 +1,47 @@
+commit 347475fed410425d7404755ddac3da4c47922d40 (HEAD -> master)
+Author: CDudar <christiandudar@gmail.com>
+Date:   Wed Dec 6 23:57:54 2017 -0700
+
+    Finishing touches, optimization, reorganized folders
+
+commit 9b931a7332230eb863e62cd471e61fcb1123b010 (origin/master)
+Author: CDudar <christiandudar@gmail.com>
+Date:   Wed Dec 6 18:51:50 2017 -0700
+
+    added profile folder
+
+commit afbc60933a2de0b31ac0e7737863c6289a3bcb67
+Author: CDudar <christiandudar@gmail.com>
+Date:   Wed Dec 6 18:50:45 2017 -0700
+
+    Added baseline fft profile, proceeding with optimizations
+
+commit a44da942d91ec03b5b0bf42e7ab49b8f1de952cd
+Author: CDudar <christiandudar@gmail.com>
+Date:   Wed Dec 6 17:37:21 2017 -0700
+
+    Added regression tests for checking WAV file equality
+
+commit 7fae57eaa9b1dac41ccadb19f87959b7c4a9bfbb
+Author: CDudar <christiandudar@gmail.com>
+Date:   Wed Dec 6 16:40:47 2017 -0700
+
+    Finished fft algorithm with no optimization
+
+commit d586f8ad10c77f77a0aaed86c26080e7fec2b4a9
+Author: Christian Dudar <CDudar@users.noreply.github.com>
+Date:   Wed Dec 6 10:39:24 2017 -0700
+
+    fast fourier transformation file begun
+
+commit a18bc7a924178fbc73fb92fd31150dd32f5b0022
+Author: Christian Dudar <CDudar@users.noreply.github.com>
+Date:   Tue Dec 5 20:21:15 2017 -0700
+
+    Successfully convolving files in the time-domain
+
+commit 5abec72d5ce4721e6547280b0224441db41b875d
+Author: CDudar <christiandudar@gmail.com>
+Date:   Sat Dec 2 14:15:40 2017 -0700
+
+    Successfully reading WAV file header contents
